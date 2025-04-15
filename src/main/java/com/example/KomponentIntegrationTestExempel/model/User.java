@@ -2,9 +2,12 @@ package com.example.KomponentIntegrationTestExempel.model;
 
 import jakarta.persistence.*;
 
+
+//@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = {"name", "email"})})
 @Entity
 @Table(name = "users")
 public class User {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,6 +15,9 @@ public class User {
 
     private String name;
 
+
+
+    @Column(unique = true)
     private String email;
 
     public User(Long id, String name, String email) {
