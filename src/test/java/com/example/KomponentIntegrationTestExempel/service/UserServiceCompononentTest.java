@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
 @SpringBootTest
+@Transactional
 public class UserServiceCompononentTest {
 
     @Autowired
@@ -23,7 +24,7 @@ public class UserServiceCompononentTest {
     @Test
     public void testCreateAndFetchUser(){
         //arrange
-        User user = new User(3L, "Bill","bill@mail.com");
+        User user = new User(null,"Bill","bill@mail.com");
 
         //act
         User savedUser = userService.createUser(user);
