@@ -1,15 +1,60 @@
-name: workflow with in memory database test
+name: workflow with docker image database test
 on: [push,pull_request]
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    steps:
-     - uses: actions/checkout@v4
+    build-with-docker:
+      runs-on: ubuntu-latest
 
-     - name: setup java 17
-       uses: actions/setup-java@v4
-       with:
-         distribution: 'temurin'
-         java-version: '17'
-     - name: Build with maven
-       run: mvn clean test
+      services:
+        mysql:
+          image: mysql:8.0
+          env:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: testdb
+            MYSQL_USER: testuser
+            MYSQL_PASSWORD: testpass
+          ports:
+            - 3306:3306
+          options: >-
+            --health-cmd="mysqladmin ping --silent"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=5
+
+      env:
+        DB_URL: jdbc:mysql://localhost:3306/testdb
+        DB_USER: testuser
+        DB_PASSWORD: testpass
+
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: setup java
+          uses: actions/setup-java@v4
+          with:
+            java-version: '17'
+            distribution: 'temurin'
+
+        - name: Wait for MySQL image to be ready
+          run: |
+            echo "waiting for Mysql..."
+            for i in {1..30}; do
+             nc -z localhost 3306 && echo "MySQL is running" && break
+             sleep 2
+            done
+
+        - name: Build and test
+          run: mvn clean verify
+
+
+#  build-and-test:
+#    runs-on: ubuntu-latest
+#    steps:
+#     - uses: actions/checkout@v4
+#
+#     - name: setup java 17
+#       uses: actions/setup-java@v4
+#       with:
+#         distribution: 'temurin'
+#         java-version: '17'
+#     - name: Build with maven
+#       run: mvn clean test
