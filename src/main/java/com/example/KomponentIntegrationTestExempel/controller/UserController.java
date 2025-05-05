@@ -19,6 +19,11 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/hello")
+    public String testHello(){
+        return "Hello AWS!";
+    }
+
     @GetMapping
     public List<User> getAllUsers(){
         return userService.getAllUsers();

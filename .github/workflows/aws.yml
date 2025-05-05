@@ -1,0 +1,33 @@
+name: Deploy to Beanstalk
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: setup java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+
+      - name: Deploy to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: komponentintegrationtestexempel
+          environment_name: Komponentintegrationtestexempel-env
+          version_label: v-${{ github.run_number}}
+          region: eu-north-1
+          deployment_package: target/KomponentIntegrationTestExempel-0.0.1-SNAPSHOT.jar
