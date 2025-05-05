@@ -1,5 +1,9 @@
 name: workflow with docker image database test
-on: [push,pull_request]
+on:
+  push:
+    branches-ignore:
+      - main
+
 jobs:
     build-with-docker:
       runs-on: ubuntu-latest
